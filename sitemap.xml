@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+  <loc>https://swdev.online/</loc>
+  <lastmod>2020-07-03T19:45:45-07:00</lastmod>
+</url>
+
+<url>
+  <loc>https://swdev.online/idempotency-of-a-put-request.html</loc>
+  <lastmod>2020-07-02T01:15:34-07:00</lastmod>
+</url>
+
+<url>
+  <loc>https://swdev.online/design-twitter-using-no-sql-1.html</loc>
+  <lastmod>2019-11-09T14:47:01-08:00</lastmod>
+</url>
+
+
+<url>
+  <loc>https://swdev.online/future-topics.html</loc>
+  <lastmod>2020-07-02T22:16:13-07:00</lastmod>
+</url>
+
+<url>
+  <loc>https://swdev.online/static-resources.html</loc>
+  <lastmod>2020-07-03T19:39:01-07:00</lastmod>
+</url>
+
+
+<url>
+  <loc>https://swdev.online/StorageSystem.html</loc>
+</url>
+
+<url>
+  <loc>https://swdev.online/SystemDesign.html</loc>
+</url>
+
+
+</urlset>

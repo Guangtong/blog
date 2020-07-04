@@ -1,0 +1,623 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+    
+  Idempotency of a PUT Request - swdev.online
+  
+  </title>
+  
+  
+  <link href="atom.xml" rel="alternate" title="swdev.online" type="application/atom+xml">
+    <link rel="stylesheet" href="asset/css/foundation.min.css" />
+    <link rel="stylesheet" href="asset/css/docs.css" />
+    <script src="asset/js/vendor/modernizr.js"></script>
+    <script src="asset/js/vendor/jquery.js"></script>
+ 
+<script type="text/javascript">
+  function before_search(){
+    var searchVal = 'site:swdev.online ' + document.getElementById('search_input').value;
+    document.getElementById('search_q').value = searchVal;
+    return true;
+  }
+</script>
+  </head>
+  <body class="antialiased hide-extras">
+    
+    <div class="marketing off-canvas-wrap" data-offcanvas>
+      <div class="inner-wrap">
+
+
+<nav class="top-bar docs-bar hide-for-small" data-topbar>
+
+
+  <section class="top-bar-section">
+  <div class="row">
+      <div style="position: relative;width:100%;"><div style="position: absolute; width:100%;">
+        <ul id="main-menu" class="left">
+        
+        <li id=""><a target="_self" href="index.html">Home</a></li>
+        
+        <li id=""><a target="_self" href="archives.html">Archives</a></li>
+        
+        <li id=""><a target="_self" href="future-topics.html">Future Topics</a></li>
+        
+        </ul>
+
+        <ul class="right" id="search-wrap">
+          <li>
+<form target="_blank" onsubmit="return before_search();" action="https://google.com/search" method="get">
+    <input type="hidden" id="search_q" name="q" value="" />
+    <input tabindex="1" type="search" id="search_input"  placeholder="Search"/>
+</form>
+</li>
+          </ul>
+      </div></div>
+  </div>
+  </section>
+
+</nav>
+
+        <nav class="tab-bar show-for-small">
+  <a href="javascript:void(0)" class="left-off-canvas-toggle menu-icon">
+    <span> &nbsp; swdev.online</span>
+  </a>
+</nav>
+
+<aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        
+        <li><a target="_self" href="index.html">Home</a></li>
+        
+        <li><a target="_self" href="archives.html">Archives</a></li>
+        
+        <li><a target="_self" href="future-topics.html">Future Topics</a></li>
+        
+
+    <li><label>Categories</label></li>
+
+        
+            <li><a href="StorageSystem.html">Storage System</a></li>
+        
+            <li><a href="SystemDesign.html">System Design</a></li>
+         
+
+      </ul>
+    </aside>
+
+<a class="exit-off-canvas" href="#"></a>
+
+
+        <section id="main-content" role="main" class="scroll-container">
+        
+       
+
+ <script type="text/javascript">
+  $(function(){
+    $('#menu_item_index').addClass('is_active');
+  });
+</script>
+<div class="row">
+  <div class="large-8 medium-8 columns">
+      <div class="markdown-body article-wrap">
+       <div class="article">
+          
+          <h1>Idempotency of a PUT Request</h1>
+     
+        <div class="read-more clearfix">
+          <span class="date">07/02/2020</span>
+
+          <span>posted in&nbsp;</span> 
+          
+              <span class="posted-in"><a href='StorageSystem.html'>Storage System</a></span>
+           
+         
+          <span class="comments">
+            
+
+            
+          </span>
+
+        </div>
+      </div><!-- article -->
+
+      <div class="article-content">
+      <ul>
+<li>
+<a href="#toc_0">1. How To Avoid Duplicate Order</a>
+<ul>
+<li>
+<a href="#toc_1">E-commerce Scenario - Common Flow of Placing Order</a>
+</li>
+<li>
+<a href="#toc_2">Cause:</a>
+</li>
+<li>
+<a href="#toc_3">Solution 1: One-time token</a>
+</li>
+<li>
+<a href="#toc_4">Solution 2: Leverage DB Primary Key uniqueness</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#toc_5">2. In general how to guarantee Idempotence of an API put request.</a>
+</li>
+<li>
+<a href="#toc_6">Action Items</a>
+</li>
+</ul>
+
+
+<h2 id="toc_0">1. How To Avoid Duplicate Order</h2>
+
+<h3 id="toc_1">E-commerce Scenario - Common Flow of Placing Order</h3>
+
+<ul>
+<li>Go to Cart</li>
+<li>Cart Page + Checkout button </li>
+<li>Checkout Page + Place order button </li>
+<li>Payment: <br/>
+US E-commerce has no such step - Credit card or PayPal are filled in Checkout Page.</li>
+<li>Success Page</li>
+</ul>
+
+<span id="more"></span><!-- more -->
+
+<h3 id="toc_2">Cause:</h3>
+
+<ul>
+<li>User clicks PlaceOrder multiple times</li>
+<li>Backend retries the call to Order service</li>
+</ul>
+
+<h3 id="toc_3">Solution 1: One-time token</h3>
+
+<ul>
+<li>Checkout page requests one-time token</li>
+<li>Store token in Redis as Key.
+<ul>
+<li>Set expired time in case there is no order placed.</li>
+<li><a href="https://redis.io/commands/pexpire">PEXPIRE token 5000</a></li>
+</ul></li>
+<li>Place order request comes with the token</li>
+<li>Order system verifies token by
+<ul>
+<li><a href="https://redis.io/commands/del">DEL token</a></li>
+<li>Return 0 means the key is already removed.</li>
+</ul></li>
+</ul>
+
+<p>Assessment: </p>
+
+<ul>
+<li>Scalability: High. 
+<ul>
+<li>Redis Sharding.</li>
+</ul></li>
+<li>Availability: High.
+<ul>
+<li>Service is down after DEL token: retries will fail. Place order will fail. </li>
+<li>Redis node is down. Token not available, place order will fail. </li>
+</ul></li>
+</ul>
+
+<h3 id="toc_4">Solution 2: Leverage DB Primary Key uniqueness</h3>
+
+<ul>
+<li>Checkout page requests orderId</li>
+<li>Place order request comes with the orderId</li>
+<li>DB creates order using orderId as primary key. </li>
+<li>Insert failure means PK already exists, this is a duplicate request. </li>
+</ul>
+
+<p>Assessment: </p>
+
+<ul>
+<li>Scalability: High</li>
+<li>Availability: Depends on proxy. If using consistent hashing which can remove the failure node, then it&#39;s high.</li>
+<li>Security: Attacker can use invalid key, we have to verify it.</li>
+</ul>
+
+<h2 id="toc_5">2. In general how to guarantee Idempotence of an API put request.</h2>
+
+<pre><code class="language-sql">INSERT INTO users (uid, age, gender, createTime)
+VALUES (1234567, 20, &quot;male&quot;, 1593684708)
+</code></pre>
+
+<p>Can we assume all INSERTS are idempotent when there is a Primary Key? </p>
+
+<ul>
+<li>No if we use AutoGenerated ID
+<ul>
+<li>MySQL <a href="https://dev.mysql.com/doc/refman/8.0/en/example-auto-increment.html">AUTO_INCREMENT</a></li>
+<li>DynamoDB <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Annotations.html#DynamoDBMapper.Annotations.DynamoDBAutoGeneratedKey">@DynamoDBAutoGeneratedKey</a> UUID is 128bit in Memory, but in DB it&#39;s a <a href="https://docs.oracle.com/javase/6/docs/api/java/util/UUID.html#toString()">string</a> of 32 chars and 4 &quot;-&quot;.</li>
+<li>MongoDB <a href="https://docs.mongodb.com/manual/reference/bson-types/#objectid">ObjectId</a> ObjectId, 12bytes number in BSON.</li>
+</ul></li>
+</ul>
+
+<p>Can we guarantee idempotency if we provide Primary Key from outside system and guarantees uniqueness. </p>
+
+<ul>
+<li>Note that DDB and MongoDB generate UUID or ObjectId at client side ! The retry of DB access can use the same ID! Using an IDGenerator service doesn&#39;t help!</li>
+<li>Therefore it&#39;s not the problem of DB retry, but the problem of API retry from up stream.</li>
+</ul>
+
+<p><strong>Conclusion</strong>: I didn&#39;t find other work-arounds, except for the above Solution 1 and 2 - the top level caller requests downstream services with a unique token / Primary Key. <br/>
+This might not be feasible if top level caller is not owned by yourself and it wants to retry.</p>
+
+<h2 id="toc_6">Action Items</h2>
+
+<ul>
+<li><p>Review Replication</p>
+<ul>
+<li>master-slave vs master-master
+<ul>
+<li>How DDB guarantees <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.AtomicCounters">Atomic update</a>? <br/>
+I think it must lock 3 replicas.<br/></li>
+</ul></li>
+<li>synchronous vs asynchronous</li>
+</ul></li>
+<li><p>Review Redis sharding</p>
+<ul>
+<li>Range partition</li>
+<li>Hash partition</li>
+</ul></li>
+</ul>
+
+
+    
+
+      </div>
+
+      <div class="row">
+        <div class="large-6 columns">
+        <p class="text-left" style="padding:15px 0px;">
+      
+        </p>
+        </div>
+        <div class="large-6 columns">
+      <p class="text-right" style="padding:15px 0px;">
+      
+          <a  href="design-twitter-using-no-sql-1.html" 
+          title="Next Post: Design Twitter - 1: Requirement and Storage Selection">Design Twitter - 1: Requirement and Storage Selection &raquo;</a>
+      
+      </p>
+        </div>
+      </div>
+      <div class="comments-wrap">
+        <div class="share-comments">
+          
+
+          
+
+          
+        </div>
+      </div>
+    </div><!-- article-wrap -->
+  </div><!-- large 8 -->
+
+
+
+
+ <div class="large-4 medium-4 columns">
+  <div class="hide-for-small">
+    <div id="sidebar" class="sidebar">
+          <div id="site-info" class="site-info">
+            
+                <div class="site-a-logo"><img src="media/15938249282414/logo.jpeg" /></div>
+            
+                <h1>swdev.online</h1>
+                <div class="site-des">A blog on software development and distributed system components.</div>
+                <div class="social">
+
+
+
+
+
+
+
+
+
+<a target="_blank" class="github" target="_blank" href="https://github.com/guangtong" title="GitHub">GitHub</a>
+
+  <a target="_blank" class="rss" href="atom.xml" title="RSS">RSS</a>
+                
+              	 </div>
+          	</div>
+
+             
+
+              <div id="site-categories" class="side-item ">
+                <div class="side-header">
+                  <h2>Categories</h2>
+                </div>
+                <div class="side-content">
+
+      	<p class="cat-list">
+        
+            <a href="StorageSystem.html"><strong>Storage System</strong></a>
+        
+            <a href="SystemDesign.html"><strong>System Design</strong></a>
+         
+        </p>
+
+
+                </div>
+              </div>
+
+              <div id="site-categories" class="side-item">
+                <div class="side-header">
+                  <h2>Recent Posts</h2>
+                </div>
+                <div class="side-content">
+                <ul class="posts-list">
+	      
+		      
+			      <li class="post">
+			        <a href="idempotency-of-a-put-request.html">Idempotency of a PUT Request</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="design-twitter-using-no-sql-1.html">Design Twitter - 1: Requirement and Storage Selection</a>
+			      </li>
+		     
+		   
+		  		</ul>
+                </div>
+              </div>
+        </div><!-- sidebar -->
+      </div><!-- hide for small -->
+</div><!-- large 4 -->
+
+</div><!-- row -->
+
+ <div class="page-bottom clearfix">
+  <div class="row">
+   <p class="copyright">Copyright &copy; 2015
+Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
+Theme used <a target="_blank" href="http://github.com">GitHub CSS</a>.</p>
+  </div>
+</div>
+
+        </section>
+      </div>
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="asset/prism.js"></script>
+
+
+<style type="text/css">
+figure{margin: 0;padding: 0;}
+figcaption{text-align:center;}
+
+/* PrismJS 1.14.0
+ http://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript */
+/**
+ * prism.js default theme for JavaScript, CSS and HTML
+ * Based on dabblet (http://dabblet.com)
+ * @author Lea Verou
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+    color: black;
+    background: none;
+    text-shadow: 0 1px white;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+    
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+    text-shadow: none;
+    background:#b3d4fc;
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+    text-shadow: none;
+    background: #b3d4fc;
+}
+
+@media print {
+    code[class*="language-"],
+    pre[class*="language-"] {
+        text-shadow: none;
+    }
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+    padding: 1em;
+    margin: .5em 0;
+    overflow: auto;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    background: #F7F7F7;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+    padding: .1em;
+    border-radius: .3em;
+    white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: slategray;
+}
+
+.token.punctuation {
+    color: #999;
+}
+
+.namespace {
+    opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+    color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+    color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    color: #9a6e3a;
+    background: hsla(0, 0%, 100%, .5);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+    color: #07a;
+}
+
+.token.function,
+.token.class-name {
+    color: #DD4A68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+    color: #e90;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+    .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber;
+    }
+
+        .line-numbers-rows > span:before {
+            content: counter(linenumber);
+            color: #999;
+            display: block;
+            padding-right: 0.8em;
+            text-align: right;
+        }
+
+</style>
+
+  
+    
+
+    <script src="asset/js/foundation.min.js"></script>
+    <script>
+      $(document).foundation();
+      function fixSidebarHeight(){
+        var w1 = $('.markdown-body').height();
+          var w2 = $('#sidebar').height();
+          if (w1 > w2) { $('#sidebar').height(w1); };
+      }
+      $(function(){
+        fixSidebarHeight();
+      })
+      $(window).load(function(){
+          fixSidebarHeight();
+      });
+     
+    </script>
+
+
+
+  </body>
+</html>
