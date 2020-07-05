@@ -137,26 +137,23 @@
 </ul>
 </li>
 <li>
-<a href="#toc_3">2. System Design</a>
+<a href="#toc_3">2. API</a>
+</li>
+<li>
+<a href="#toc_4">3. Storage Choice</a>
 <ul>
 <li>
-<a href="#toc_4">2.1 API</a>
+<a href="#toc_5">3.1 RDBMS</a>
 </li>
 <li>
-<a href="#toc_5">2.2 Storage Choice</a>
-<ul>
-<li>
-<a href="#toc_6">2.2.1 RDBMS</a>
-</li>
-<li>
-<a href="#toc_7">2.2.2 NoSQL</a>
-</li>
-</ul>
+<a href="#toc_6">3.2 NoSQL</a>
 </li>
 </ul>
 </li>
 </ul>
 
+
+<span id="more"></span><!-- more -->
 
 <h2 id="toc_0">1. Requirement</h2>
 
@@ -176,8 +173,6 @@ I can delete my tweets, so that no one can see it any more.
 </code></pre>
 
 <p>NOTE: If this is an interview, you&#39;d better list some common use cases, but pick one or two key use cases to go in depth. Time slips away quickly when you explain a design. You want to show the breadth and depth of your knowledge.</p>
-
-<span id="more"></span><!-- more -->
 
 <h3 id="toc_2">1.2 Volume</h3>
 
@@ -259,15 +254,13 @@ I can delete my tweets, so that no one can see it any more.
 315 Million tweets per year (10% of Peak post TPS is 10. 10 * 365 * 24 * 3600 = 315 M)</li>
 </ul>
 
-<h2 id="toc_3">2. System Design</h2>
+<h2 id="toc_3">2. API</h2>
 
-<h3 id="toc_4">2.1 API</h3>
+<p>Each use case can be a RESTFUL API.</p>
 
-<p>Each use case can be a RESTFUL API</p>
+<h2 id="toc_4">3. Storage Choice</h2>
 
-<h3 id="toc_5">2.2 Storage Choice</h3>
-
-<h4 id="toc_6">2.2.1 RDBMS</h4>
+<h3 id="toc_5">3.1 RDBMS</h3>
 
 <p>Both user table and tweets table are too big for RDBMS without sharding. Usually one MySQL table is good for &lt; 1M rows. </p>
 
@@ -289,7 +282,7 @@ I can delete my tweets, so that no one can see it any more.
 
 <p>Therefore RDBMS is not considered as scalable.</p>
 
-<h4 id="toc_7">2.2.2 NoSQL</h4>
+<h3 id="toc_6">3.2 NoSQL</h3>
 
 <p>No SQL is good for this use case - No complex join, No transaction, Eventual consistency is enough.</p>
 
@@ -317,8 +310,8 @@ I can delete my tweets, so that no one can see it any more.
         <div class="large-6 columns">
         <p class="text-left" style="padding:15px 0px;">
       
-          <a href="idempotency-of-a-put-request.html" 
-          title="Previous Post: Idempotency of a PUT Request">&laquo; Idempotency of a PUT Request</a>
+          <a href="a-upward-trend-id-generation-s.html" 
+          title="Previous Post: A upward trend ID generation service">&laquo; A upward trend ID generation service</a>
       
         </p>
         </div>
@@ -404,6 +397,12 @@ I can delete my tweets, so that no one can see it any more.
 		  
 		      
 			      <li class="post">
+			        <a href="a-upward-trend-id-generation-s.html">A upward trend ID generation service</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="design-twitter-using-no-sql-1.html">Design Twitter - 1: Requirement and Storage Selection</a>
 			      </li>
 		     
@@ -419,9 +418,9 @@ I can delete my tweets, so that no one can see it any more.
 
  <div class="page-bottom clearfix">
   <div class="row">
-   <p class="copyright">Copyright &copy; 2015
+   <p class="copyright">&copy; 2020
 Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a>,&nbsp; 
-Theme used <a target="_blank" href="http://github.com">GitHub CSS</a>.</p>
+Hosted on <a target="_blank" href="https://pages.github.com">GitHub Pages</a>.</p>
   </div>
 </div>
 

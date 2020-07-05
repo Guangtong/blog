@@ -2,12 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
   <loc>https://swdev.online/</loc>
-  <lastmod>2020-07-03T19:45:45-07:00</lastmod>
+  <lastmod>2020-07-05T00:25:11-07:00</lastmod>
 </url>
 
 <url>
   <loc>https://swdev.online/idempotency-of-a-put-request.html</loc>
   <lastmod>2020-07-02T01:15:34-07:00</lastmod>
+</url>
+
+<url>
+  <loc>https://swdev.online/a-upward-trend-id-generation-s.html</loc>
+  <lastmod>2020-07-02T01:15:27-07:00</lastmod>
 </url>
 
 <url>
@@ -18,7 +23,7 @@
 
 <url>
   <loc>https://swdev.online/future-topics.html</loc>
-  <lastmod>2020-07-02T22:16:13-07:00</lastmod>
+  <lastmod>2020-07-04T18:18:01-07:00</lastmod>
 </url>
 
 <url>
