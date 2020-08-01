@@ -4,7 +4,7 @@
   <title><![CDATA[swdev.online]]></title>
   <link href="https://swdev.online/atom.xml" rel="self"/>
   <link href="https://swdev.online/"/>
-  <updated>2020-08-01T03:31:45-07:00</updated>
+  <updated>2020-08-01T03:33:58-07:00</updated>
   <id>https://swdev.online/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -14,9 +14,9 @@
   
   <entry>
     <title type="html"><![CDATA[Reading Dubbo Source Code - 1. Setup the Environment and Run Demo]]></title>
-    <link href="https://swdev.online/15962593173836.html"/>
+    <link href="https://swdev.online/reading-dubbo-source-code--1.html"/>
     <updated>2020-07-31T22:21:57-07:00</updated>
-    <id>https://swdev.online/15962593173836.html</id>
+    <id>https://swdev.online/reading-dubbo-source-code--1.html</id>
     <content type="html"><![CDATA[
 <ul>
 <li>
