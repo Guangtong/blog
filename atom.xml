@@ -4,7 +4,7 @@
   <title><![CDATA[swdev.online]]></title>
   <link href="https://swdev.online/atom.xml" rel="self"/>
   <link href="https://swdev.online/"/>
-  <updated>2020-08-01T03:33:58-07:00</updated>
+  <updated>2020-08-01T03:45:54-07:00</updated>
   <id>https://swdev.online/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -20,28 +20,31 @@
     <content type="html"><![CDATA[
 <ul>
 <li>
-<a href="#toc_0">1. High level architecture and usgae</a>
+<a href="#toc_0">0. New Series</a>
 </li>
 <li>
-<a href="#toc_1">2. Import to IntelliJ</a>
+<a href="#toc_1">1. High level architecture and usage</a>
 </li>
 <li>
-<a href="#toc_2">3. Dubbo Modules (Artifacts)</a>
+<a href="#toc_2">2. Import to IntelliJ</a>
 </li>
 <li>
-<a href="#toc_3">4. Local Debug</a>
+<a href="#toc_3">3. Dubbo Modules (Artifacts)</a>
+</li>
+<li>
+<a href="#toc_4">4. Local Debug</a>
 <ul>
 <li>
-<a href="#toc_4">4.1 Setup Zookeeper as Registry Center</a>
+<a href="#toc_5">4.1 Setup Zookeeper as Registry Center</a>
 </li>
 <li>
-<a href="#toc_5">4.2 Provider and Consumer</a>
+<a href="#toc_6">4.2 Provider and Consumer</a>
 </li>
 <li>
-<a href="#toc_6">4.3 Run</a>
+<a href="#toc_7">4.3 Run</a>
 </li>
 <li>
-<a href="#toc_7">4.4 Zookeeper Review</a>
+<a href="#toc_8">4.4 Zookeeper Review</a>
 </li>
 </ul>
 </li>
@@ -50,15 +53,20 @@
 
 <span id="more"></span><!-- more -->
 
-<h2 id="toc_0">1. High level architecture and usgae</h2>
+<h2 id="toc_0">0. New Series</h2>
 
-<p>Dubbo is a Registry based RPC framework. Provider (service) register endpoint metadata to Registry. Consumer (client of service) subscribe and cache the service endpoint from Registry.<br/>
+<p>I&#39;ll start a new series on <strong>Reading Dubbo Source Code</strong>. <br/>
+It might not be as popular as Spring Cloud when used in building microservices. But I think its source code is the best learning material for architecting high performance RPC framework. </p>
+
+<h2 id="toc_1">1. High level architecture and usage</h2>
+
+<p>Dubbo is a Registry based RPC framework. Provider (service) registers endpoint and metadata to Registry. Consumer (client of service) subscribes and caches the service endpoint from Registry.<br/>
 <img src="https://camo.githubusercontent.com/660e543510891254fa0ca6138af3350458aa0582/687474703a2f2f647562626f2e6170616368652e6f72672f696d672f6172636869746563747572652e706e67" alt=""/></p>
 
-<p>To use the RPC framework, Service side provide a java interface class to client. Client use that interface to call the methods.<br/>
+<p>To use the RPC framework, Service side provides a java interface to the client. Client uses that interface to call the methods.<br/>
 Dubbo Spring integration provides a bean whose type is the interface and the implementation is a proxy (getting endpoint from Registry center and calling provider service).</p>
 
-<h2 id="toc_1">2. Import to IntelliJ</h2>
+<h2 id="toc_2">2. Import to IntelliJ</h2>
 
 <pre><code class="language-text">git clone https://github.com/apache/dubbo.git
 </code></pre>
@@ -66,13 +74,13 @@ Dubbo Spring integration provides a bean whose type is the interface and the imp
 <p>IntellJ -&gt; <code>Open</code> -&gt;  find your dubbo folder<br/>
 IntellJ will automatically recognize it as a maven project and downloads dependencies. </p>
 
-<h2 id="toc_2">3. Dubbo Modules (Artifacts)</h2>
+<h2 id="toc_3">3. Dubbo Modules (Artifacts)</h2>
 
 <p><img src="media/15962593173836/15962632902281.jpg" alt=""/></p>
 
-<h2 id="toc_3">4. Local Debug</h2>
+<h2 id="toc_4">4. Local Debug</h2>
 
-<h3 id="toc_4">4.1 Setup Zookeeper as Registry Center</h3>
+<h3 id="toc_5">4.1 Setup Zookeeper as Registry Center</h3>
 
 <p>Download: <a href="https://zookeeper.apache.org/releases.html">https://zookeeper.apache.org/releases.html</a><br/>
 Any version will do - we can use release line 3.6 because ZooKeeper clients from 3.4 and 3.5 branch are fully compatible with 3.6 servers.</p>
@@ -84,7 +92,7 @@ The default path is <code>./conf</code>. As a local test environment, I will jus
 ./bin/zkServer.sh start
 </code></pre>
 
-<h3 id="toc_5">4.2 Provider and Consumer</h3>
+<h3 id="toc_6">4.2 Provider and Consumer</h3>
 
 <p><code>dubbo-demo</code> module provides three ways to use Dubbo. The essence is the same. The service provider is DemoService and the consumer is just a main method.</p>
 
@@ -111,7 +119,7 @@ The default path is <code>./conf</code>. As a local test environment, I will jus
 CompletableFuture&lt;String&gt; hello = demoService.sayHelloAsync(&quot;world&quot;);
 </code></pre>
 
-<h3 id="toc_6">4.3 Run</h3>
+<h3 id="toc_7">4.3 Run</h3>
 
 <p>We use maven to build Dubbo. It can be done in CLI or in IntelliJ maven plugin. <br/>
 <img src="media/15962593173836/15962699434104.jpg" alt=""/></p>
@@ -161,9 +169,11 @@ dubbo version: , current host: 192.168.43.137
 dubbo version: , current host: 192.168.43.137
 </code></pre>
 
-<h3 id="toc_7">4.4 Zookeeper Review</h3>
+<h3 id="toc_8">4.4 Zookeeper Review</h3>
 
-<pre><code class="language-cli">[zk: 127.0.0.1:2181(CONNECTED) 1] ls /
+<pre><code class="language-cli">$ bin/zkCli.sh -server 127.0.0.1:2181
+
+[zk: 127.0.0.1:2181(CONNECTED) 1] ls /
 [dubbo, zookeeper]
 
 [zk: 127.0.0.1:2181(CONNECTED) 2] ls -R /dubbo
