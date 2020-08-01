@@ -4,13 +4,189 @@
   <title><![CDATA[swdev.online]]></title>
   <link href="https://swdev.online/atom.xml" rel="self"/>
   <link href="https://swdev.online/"/>
-  <updated>2020-07-11T13:33:00-07:00</updated>
+  <updated>2020-08-01T03:29:22-07:00</updated>
   <id>https://swdev.online/</id>
   <author>
     <name><![CDATA[]]></name>
     
   </author>
   <generator uri="http://www.mweb.im/">MWeb</generator>
+  
+  <entry>
+    <title type="html"><![CDATA[Reading Dubbo Source Code - 1. Setup the environment]]></title>
+    <link href="https://swdev.online/15962593173836.html"/>
+    <updated>2020-07-31T22:21:57-07:00</updated>
+    <id>https://swdev.online/15962593173836.html</id>
+    <content type="html"><![CDATA[
+<ul>
+<li>
+<a href="#toc_0">1. High level architecture and usgae</a>
+</li>
+<li>
+<a href="#toc_1">2. Import to IntelliJ</a>
+</li>
+<li>
+<a href="#toc_2">3. Dubbo Modules (Artifacts)</a>
+</li>
+<li>
+<a href="#toc_3">4. Local Debug</a>
+<ul>
+<li>
+<a href="#toc_4">4.1 Setup Zookeeper as Registry Center</a>
+</li>
+<li>
+<a href="#toc_5">4.2 Provider and Consumer</a>
+</li>
+<li>
+<a href="#toc_6">4.3 Run</a>
+</li>
+<li>
+<a href="#toc_7">4.4 Zookeeper Review</a>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<span id="more"></span><!-- more -->
+
+<h2 id="toc_0">1. High level architecture and usgae</h2>
+
+<p>Dubbo is a Registry based RPC framework. Provider (service) register endpoint metadata to Registry. Consumer (client of service) subscribe and cache the service endpoint from Registry.<br/>
+<img src="https://camo.githubusercontent.com/660e543510891254fa0ca6138af3350458aa0582/687474703a2f2f647562626f2e6170616368652e6f72672f696d672f6172636869746563747572652e706e67" alt=""/></p>
+
+<p>To use the RPC framework, Service side provide a java interface class to client. Client use that interface to call the methods.<br/>
+Dubbo Spring integration provides a bean whose type is the interface and the implementation is a proxy (getting endpoint from Registry center and calling provider service).</p>
+
+<h2 id="toc_1">2. Import to IntelliJ</h2>
+
+<pre><code class="language-text">git clone https://github.com/apache/dubbo.git
+</code></pre>
+
+<p>IntellJ -&gt; <code>Open</code> -&gt;  find your dubbo folder<br/>
+IntellJ will automatically recognize it as a maven project and downloads dependencies. </p>
+
+<h2 id="toc_2">3. Dubbo Modules (Artifacts)</h2>
+
+<p><img src="media/15962593173836/15962632902281.jpg" alt=""/></p>
+
+<h2 id="toc_3">4. Local Debug</h2>
+
+<h3 id="toc_4">4.1 Setup Zookeeper as Registry Center</h3>
+
+<p>Download: <a href="https://zookeeper.apache.org/releases.html">https://zookeeper.apache.org/releases.html</a><br/>
+Any version will do - we can use release line 3.6 because ZooKeeper clients from 3.4 and 3.5 branch are fully compatible with 3.6 servers.</p>
+
+<p>The start script <code>zkServer.sh</code> uses <code>zoo.cfg</code> as config file. <br/>
+The default path is <code>./conf</code>. As a local test environment, I will just copy the provided  <code>./conf/zoo_sample.cfg</code> to <code>./conf/zoo.cfg</code> to make the start script work. This is a basic config that setup port to <code>2181</code> for this single host server and store data into <code>/tmp</code> folder. </p>
+
+<pre><code class="language-text">cp ./conf/zoo_sample.cfg ./conf/zoo.cfg
+./bin/zkServer.sh start
+</code></pre>
+
+<h3 id="toc_5">4.2 Provider and Consumer</h3>
+
+<p><code>dubbo-demo</code> module provides three ways to use Dubbo. The essence is the same. The service provider is DemoService and the consumer is just a main method.</p>
+
+<p>Service provider creates the actual serviceImpl bean, and pass it to <code>interface</code> definition:</p>
+
+<pre><code class="language-markup">&lt;bean id=&quot;demoService&quot; class=&quot;org.apache.dubbo.demo.provider.DemoServiceImpl&quot;/&gt; 
+&lt;dubbo:service interface=&quot;org.apache.dubbo.demo.DemoService&quot; ref=&quot;demoService&quot;/&gt;
+</code></pre>
+
+<p>Service provider needs to register itself to Registry Center.</p>
+
+<pre><code class="language-markup">&lt;dubbo:registry address=&quot;zookeeper://127.0.0.1:2181&quot;/&gt; 
+</code></pre>
+
+<p>Then the client side can use the interface class to create a proxy bean, and call the methods of the bean like local methods. </p>
+
+<pre><code class="language-markup">&lt;dubbo:reference id=&quot;demoService&quot; check=&quot;false&quot;  
+                 interface=&quot;org.apache.dubbo.demo.DemoService&quot;/&gt;
+</code></pre>
+
+<p>Client side code:</p>
+
+<pre><code class="language-java">DemoService demoService = context.getBean(&quot;demoService&quot;, DemoService.class);
+CompletableFuture&lt;String&gt; hello = demoService.sayHelloAsync(&quot;world&quot;);
+</code></pre>
+
+<h3 id="toc_6">4.3 Run</h3>
+
+<p>We use maven to build Dubbo. It can be done in CLI or in IntelliJ maven plugin. <br/>
+<img src="media/15962593173836/15962699434104.jpg" alt=""/></p>
+
+<pre><code class="language-text">mvn clean install -Dmaven.test.skip=true 
+</code></pre>
+
+<p>Then we can start server and client just by running their main method. <br/>
+Yes, the server is not using any Servlet container. Dubbo uses Netty to serve dubbo protocol!</p>
+
+<p>Logs from server shows it automatically register its current IP address (my laptop ip in LAN) and port (default 20880) to zookeeper (127.0.0.1:2181), with supported methods and interface name. </p>
+
+<pre><code class="language-txt">[01/08/20 01:29:26:649 PDT] main  INFO config.ServiceConfig:  
+[DUBBO] Register dubbo service org.apache.dubbo.demo.DemoService url 
+dubbo://192.168.43.137:20880/org.apache.dubbo.demo.DemoService? 
+anyhost=true&amp;application=demo-provider&amp;bind.ip=192.168.43.137&amp;bind.port=20880&amp;deprecated=false
+&amp;dubbo=2.0.2&amp;dynamic=true&amp;generic=false&amp;interface=org.apache.dubbo.demo.DemoService
+&amp;metadata-type=remote &amp;methods=sayHello,sayHelloAsync&amp;pid=88546&amp;qos.port=22222&amp;release=
+&amp;side=provider&amp;timestamp=1596270566561 to registry registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?
+application=demo-provider &amp;dubbo=2.0.2&amp;metadata-type=remote&amp;pid=88546&amp;qos.port=22222
+&amp;registry=zookeeper&amp;timestamp=1596270566555, dubbo version: , 
+current host: 192.168.43.137
+
+[01/08/20 01:29:26:927 PDT] main  INFO transport.AbstractServer:  
+[DUBBO] Start NettyServer bind /0.0.0.0:20880, 
+export /192.168.43.137:20880, dubbo version: , current host: 192.168.43.137
+</code></pre>
+
+<p>Client side log shows it successfully gets the endpoint of service from Zookeeper. </p>
+
+<pre><code class="language-txt">[01/08/20 01:41:52:344 PDT] main  INFO zookeeper.ZookeeperRegistry:  
+[DUBBO] Register: consumer://192.168.43.137/org.apache.dubbo.demo.DemoService?
+application=demo-consumer&amp;category=consumers&amp;check=false&amp;dubbo=2.0.2&amp;init=false
+&amp;interface=org.apache.dubbo.demo.DemoService&amp;metadata-type=remote&amp;methods=sayHello,sayHelloAsync
+&amp;pid=94685&amp;qos.port=33333&amp;side=consumer&amp;sticky=false&amp;timestamp=1596271312243, 
+dubbo version: , current host: 192.168.43.137
+
+[01/08/20 01:41:52:372 PDT] main  INFO zookeeper.ZookeeperRegistry:  
+[DUBBO] Subscribe: consumer://192.168.43.137/org.apache.dubbo.demo.DemoService?
+application=demo-consumer&amp;category=providers,configurators,routers&amp;check=false&amp;dubbo=2.0.2
+&amp;init=false&amp;interface=org.apache.dubbo.demo.DemoService&amp;metadata-type=remote&amp;methods=sayHello,sayHelloAsync
+&amp;pid=94685&amp;qos.port=33333&amp;side=consumer&amp;sticky=false&amp;timestamp=1596271312243, 
+dubbo version: , current host: 192.168.43.137
+
+[01/08/20 01:41:52:712 PDT] NettyClientWorker-1-1  INFO netty4.NettyClientHandler:  
+[DUBBO] The connection of /192.168.43.137:62158 -&gt; /192.168.43.137:20880 is established., 
+dubbo version: , current host: 192.168.43.137
+</code></pre>
+
+<h3 id="toc_7">4.4 Zookeeper Review</h3>
+
+<pre><code class="language-cli">[zk: 127.0.0.1:2181(CONNECTED) 1] ls /
+[dubbo, zookeeper]
+
+[zk: 127.0.0.1:2181(CONNECTED) 2] ls -R /dubbo
+
+/dubbo/config/mapping/org.apache.dubbo.demo.DemoService/demo-provider
+/dubbo/metadata/org.apache.dubbo.demo.DemoService/consumer/demo-consumer
+/dubbo/metadata/org.apache.dubbo.demo.DemoService/provider/demo-provider
+/dubbo/org.apache.dubbo.demo.DemoService/configurators
+/dubbo/org.apache.dubbo.demo.DemoService/consumers
+/dubbo/org.apache.dubbo.demo.DemoService/routers
+/dubbo/org.apache.dubbo.demo.DemoService/providers/dubbo%3A%2F%2F192.168.43.137%3A20880%2Forg.apache.dubbo.demo.DemoService
+%3Fanyhost%3Dtrue%26application%3Ddemo-provider%26deprecated%3Dfalse%26dubbo%3D2.0.2%26dynamic
+%3Dtrue%26generic%3Dfalse%26interface%3Dorg.apache.dubbo.demo.DemoService
+%26metadata-type%3Dremote%26methods%3DsayHello%2CsayHelloAsync%26pid%3D88546
+%26release%3D%26side%3Dprovider%26timestamp%3D1596270566561
+</code></pre>
+
+<p>(I only list leaf nodes in above <code>ls -R /dubbo</code> results.)</p>
+
+<p>The last item is exactly the same as the one in service log &quot;Register dubbo service...&quot;. </p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[An upward trend ID generation service]]></title>
@@ -91,21 +267,29 @@
 <h2 id="toc_0">1. First question - why do we need a sequential ID instead of a random UUID?</h2>
 
 <ul>
-<li>UUID takes space! We have to store it as HEX string, with 32 chars &amp; 4 &#39;-&#39;.
+<li><p>UUID takes space! We have to store it as HEX string, with 32 chars &amp; 4 &#39;-&#39;.</p>
 <ul>
-<li>UUID has 128bit in binary, 39 chars as Decimal string, 32 chars as HEX string.</li>
-<li>MySQL BIGINT: 64bit, not enough for 128bit.</li>
-<li>DDB Number: Support Java BigInteger, can be any size. However, it is actually a Decimal string in storage.</li>
-</ul></li>
-<li>No conflict even when there are already a lot of existing IDs.
+<li>UUID has 128bit in binary - will be 39 chars as Decimal string or 32 chars as HEX string.</li>
+<li>Consider the data type to store it:
 <ul>
-<li>(Conflict is not a practical concern for random UUID)</li>
+<li>MySQL <code>BIGINT</code>: 64bit, not enough for 128bit.</li>
+<li>MySQL &#39;VARCHAR(36)`: 36 chars to store the HEX string with 4 &#39;-&#39;s. </li>
+<li>DynamoDB <code>Number</code>: Support Java BigInteger, can be any size. However, it is actually a Decimal string in storage, which takes 39 chars.</li>
+<li>DynamoDB <code>String</code>: 36 chars to store the HEX string with 4 &#39;-&#39;s. </li>
 </ul></li>
-<li>Some business requirement <code>may</code> require the ID to be in an upward trend. 
+</ul></li>
+<li><p>Some business requirement <code>may</code> require the ID to be in an upward trend. </p>
 <ul>
-<li>StatementId, OrderId, TweetId.</li>
-<li>Although there may be a <code>creationTime</code> column, twitter said they prefer to <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">sort tweets by ID</a> (probably they want to save some bandwidth by not sending <code>createTime</code>)</li>
+<li>StatementId, OrderId, TweetId.
+<ul>
+<li>Twitter Example
+<ul>
+<li>Although there may be a <code>creationTime</code> column, twitter said they prefer to <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">sort tweets by ID</a>. </li>
+<li>The timeline of a user is paginated. If the tweetId has order and is stored as sort key (e.g. MySQL indexed column, DDB Sort Key, HBase Column Key, etc.), the query to get next page will be very efficient. </li>
 </ul></li>
+</ul></li>
+</ul></li>
+<li><p>UUID might have duplicates when there are already a lot of existing IDs. But this is not a practical concern because <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions">the probability to find a duplicate within 103 trillion version-4 UUIDs is one in a billion</a></p></li>
 </ul>
 
 <h3 id="toc_1">1.1 2nd Question is why do I write this article.</h3>

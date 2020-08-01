@@ -79,6 +79,8 @@
     <li><label>Categories</label></li>
 
         
+            <li><a href="Server%20and%20RPC.html">Server and RPC</a></li>
+        
             <li><a href="StorageSystem.html">Storage System</a></li>
         
             <li><a href="SystemDesign.html">System Design</a></li>
@@ -197,21 +199,29 @@
 <h2 id="toc_0">1. First question - why do we need a sequential ID instead of a random UUID?</h2>
 
 <ul>
-<li>UUID takes space! We have to store it as HEX string, with 32 chars &amp; 4 &#39;-&#39;.
+<li><p>UUID takes space! We have to store it as HEX string, with 32 chars &amp; 4 &#39;-&#39;.</p>
 <ul>
-<li>UUID has 128bit in binary, 39 chars as Decimal string, 32 chars as HEX string.</li>
-<li>MySQL BIGINT: 64bit, not enough for 128bit.</li>
-<li>DDB Number: Support Java BigInteger, can be any size. However, it is actually a Decimal string in storage.</li>
-</ul></li>
-<li>No conflict even when there are already a lot of existing IDs.
+<li>UUID has 128bit in binary - will be 39 chars as Decimal string or 32 chars as HEX string.</li>
+<li>Consider the data type to store it:
 <ul>
-<li>(Conflict is not a practical concern for random UUID)</li>
+<li>MySQL <code>BIGINT</code>: 64bit, not enough for 128bit.</li>
+<li>MySQL &#39;VARCHAR(36)`: 36 chars to store the HEX string with 4 &#39;-&#39;s. </li>
+<li>DynamoDB <code>Number</code>: Support Java BigInteger, can be any size. However, it is actually a Decimal string in storage, which takes 39 chars.</li>
+<li>DynamoDB <code>String</code>: 36 chars to store the HEX string with 4 &#39;-&#39;s. </li>
 </ul></li>
-<li>Some business requirement <code>may</code> require the ID to be in an upward trend. 
+</ul></li>
+<li><p>Some business requirement <code>may</code> require the ID to be in an upward trend. </p>
 <ul>
-<li>StatementId, OrderId, TweetId.</li>
-<li>Although there may be a <code>creationTime</code> column, twitter said they prefer to <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">sort tweets by ID</a> (probably they want to save some bandwidth by not sending <code>createTime</code>)</li>
+<li>StatementId, OrderId, TweetId.
+<ul>
+<li>Twitter Example
+<ul>
+<li>Although there may be a <code>creationTime</code> column, twitter said they prefer to <a href="https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html">sort tweets by ID</a>. </li>
+<li>The timeline of a user is paginated. If the tweetId has order and is stored as sort key (e.g. MySQL indexed column, DDB Sort Key, HBase Column Key, etc.), the query to get next page will be very efficient. </li>
 </ul></li>
+</ul></li>
+</ul></li>
+<li><p>UUID might have duplicates when there are already a lot of existing IDs. But this is not a practical concern because <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions">the probability to find a duplicate within 103 trillion version-4 UUIDs is one in a billion</a></p></li>
 </ul>
 
 <h3 id="toc_1">1.1 2nd Question is why do I write this article.</h3>
@@ -435,6 +445,9 @@ Found a good article on it - <a href="https://codeburst.io/why-shouldnt-you-trus
         <div class="large-6 columns">
         <p class="text-left" style="padding:15px 0px;">
       
+          <a href="15962593173836.html" 
+          title="Previous Post: Reading Dubbo Source Code - 1. Setup the environment">&laquo; Reading Dubbo Source Code - 1. Setup the environment</a>
+      
         </p>
         </div>
         <div class="large-6 columns">
@@ -497,6 +510,8 @@ Found a good article on it - <a href="https://codeburst.io/why-shouldnt-you-trus
 
       	<p class="cat-list">
         
+            <a href="Server%20and%20RPC.html"><strong>Server and RPC</strong></a>
+        
             <a href="StorageSystem.html"><strong>Storage System</strong></a>
         
             <a href="SystemDesign.html"><strong>System Design</strong></a>
@@ -514,6 +529,12 @@ Found a good article on it - <a href="https://codeburst.io/why-shouldnt-you-trus
                 <div class="side-content">
                 <ul class="posts-list">
 	      
+		      
+			      <li class="post">
+			        <a href="15962593173836.html">Reading Dubbo Source Code - 1. Setup the environment</a>
+			      </li>
+		     
+		  
 		      
 			      <li class="post">
 			        <a href="an-upward-trend-id-generation.html">An upward trend ID generation service</a>
