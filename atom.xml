@@ -4,7 +4,7 @@
   <title><![CDATA[swdev.online]]></title>
   <link href="https://swdev.online/atom.xml" rel="self"/>
   <link href="https://swdev.online/"/>
-  <updated>2020-09-04T23:19:16-07:00</updated>
+  <updated>2020-09-04T23:24:42-07:00</updated>
   <id>https://swdev.online/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -13,7 +13,7 @@
   <generator uri="http://www.mweb.im/">MWeb</generator>
   
   <entry>
-    <title type="html"><![CDATA[Management Dependencies for a Python Service]]></title>
+    <title type="html"><![CDATA[Manage Dependencies for a Python Service]]></title>
     <link href="https://swdev.online/manage-dependencies-python.html"/>
     <updated>2020-09-04T21:27:32-07:00</updated>
     <id>https://swdev.online/manage-dependencies-python.html</id>
