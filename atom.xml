@@ -4,13 +4,55 @@
   <title><![CDATA[swdev.online]]></title>
   <link href="https://swdev.online/atom.xml" rel="self"/>
   <link href="https://swdev.online/"/>
-  <updated>2020-08-01T03:45:54-07:00</updated>
+  <updated>2020-09-04T20:29:24-07:00</updated>
   <id>https://swdev.online/</id>
   <author>
     <name><![CDATA[]]></name>
     
   </author>
   <generator uri="http://www.mweb.im/">MWeb</generator>
+  
+  <entry>
+    <title type="html"><![CDATA[SSH Tunneling Example]]></title>
+    <link href="https://swdev.online/ssh-tunneling-example.html"/>
+    <updated>2020-08-11T15:53:51-07:00</updated>
+    <id>https://swdev.online/ssh-tunneling-example.html</id>
+    <content type="html"><![CDATA[
+<h2 id="toc_0">Format</h2>
+
+<p><code>ssh -N -L &lt;local port&gt;:&lt;remote host&gt;:&lt;remote port&gt; &lt;SSH server&gt;<br/>
+</code></p>
+
+<ul>
+<li><code>-N</code>: Not to execute shell command, only listen and forward. </li>
+<li><code>-L</code>: Listen to <code>&lt;local port&gt;</code> on client machine.</li>
+<li>Any data send to this <code>&lt;local port&gt;</code> is forward to <code>&lt;remote host&gt;:&lt;remote port&gt;</code>. Therefore the application on <code>&lt;remote host&gt;</code> listening to <code>&lt;remote port&gt;</code> is used as if it was a local application. </li>
+<li><code>&lt;remote host&gt;</code> is usually the same as <code>&lt;SSH server&gt;</code>, i.e. <code>&lt;remote host&gt;</code> is localhost relative to <code>&lt;SSH server&gt;</code>.</li>
+<li><code>&lt;remote host&gt;</code> can be also be not on <code>&lt;SSH server&gt;</code>, i.e. <code>&lt;SSH server&gt;</code> is used as a bridge when data is forwarded from <code>&lt;SSH client&gt;:&lt;local port&gt;</code>and <code>&lt;remote host&gt;:&lt;remote port&gt;</code></li>
+</ul>
+
+<p><img src="media/15971864317792/15971864950747.jpg" alt=""/></p>
+
+<h2 id="toc_1">Example</h2>
+
+<h3 id="toc_2">1. Remote Debug a service on a cloud server <ssh_server></h3>
+
+<p>Forward client machines&#39;s <code>localhost:5050</code> to <ssh_server>&#39;s <code>localhost:5050</code></p>
+
+<p><code>ssh -N -L 5050:localhost:5050 &lt;username&gt;@&lt;ssh_server&gt;</code></p>
+
+<h3 id="toc_3">2. Remote Debug a service on a cloud server <target_host> through a bastion host <ssh_server></h3>
+
+<p>On client machine, forward client machine&#39;s <code>5022</code> to <code>&lt;target_host&gt;:22</code>. The goal is to use client machine&#39;s <code>5022</code> port as if it was <code>&lt;target_host&gt;:22</code>. After this setting, data to local <code>5022</code> is forwarded to <code>&lt;target_host&gt;:22</code> , therefore local becomes a local endpointwe make local <code>5022</code> to be the same you can even ssh to <code>&lt;target_host&gt;:22</code> by <code>ssh -p 5022 localhost</code>.</p>
+
+<p><code>ssh -A -N -L 5022:&lt;target_host&gt;:22 &lt;username&gt;@&lt;ssh_server&gt;</code></p>
+
+<p>On client machine, forward client machine&#39;s <code>5050</code> to <code>localhost:5050</code> through <code>localhost</code>.</p>
+
+<p><code>ssh -p 5022 -N -L 5050:localhost:5050 localhost</code></p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Reading Dubbo Source Code - 1. Setup the Environment and Run Demo]]></title>
@@ -47,6 +89,12 @@
 <a href="#toc_8">4.4 Zookeeper Review</a>
 </li>
 </ul>
+</li>
+<li>
+<a href="#toc_9">5. Dubbo URL</a>
+</li>
+<li>
+<a href="#toc_10">6. Further questions that I don&#39;t have the answers yet</a>
 </li>
 </ul>
 
@@ -94,7 +142,7 @@ The default path is <code>./conf</code>. As a local test environment, I will jus
 
 <h3 id="toc_6">4.2 Provider and Consumer</h3>
 
-<p><code>dubbo-demo</code> module provides three ways to use Dubbo. The essence is the same. The service provider is DemoService and the consumer is just a main method.</p>
+<p><code>dubbo-demo</code> module provides three flavors to use Dubbo. The service provider is DemoService and the consumer is just a main method. Let&#39;s take the XML configured Spring as example. </p>
 
 <p>Service provider creates the actual serviceImpl bean, and pass it to <code>interface</code> definition:</p>
 
@@ -127,8 +175,7 @@ CompletableFuture&lt;String&gt; hello = demoService.sayHelloAsync(&quot;world&qu
 <pre><code class="language-text">mvn clean install -Dmaven.test.skip=true 
 </code></pre>
 
-<p>Then we can start server and client just by running their main method. <br/>
-Yes, the server is not using any Servlet container. Dubbo uses Netty to serve dubbo protocol!</p>
+<p>Then we can start server and client just by running their main methods (Click the <code>run</code> on <code>main()</code> in IntelliJ, or use the CLI given in <code>dubbo-demo/README.md</code> which is the basic way to run a jar <code>java -jar jarName.jar</code>). Yes, the server is not using any Servlet container. Dubbo uses Netty to serve dubbo protocol!</p>
 
 <p>Logs from server shows it automatically register its current IP address (my laptop ip in LAN) and port (default 20880) to zookeeper (127.0.0.1:2181), with supported methods and interface name. </p>
 
@@ -193,7 +240,28 @@ dubbo version: , current host: 192.168.43.137
 
 <p>(I only list leaf nodes in above <code>ls -R /dubbo</code> results.)</p>
 
-<p>The last item is exactly the same as the one in service log &quot;Register dubbo service...&quot;. </p>
+<p>The last item is the Dubbo URL which also got logged when service starts - &quot;Register dubbo service...&quot;. </p>
+
+<h2 id="toc_9">5. Dubbo URL</h2>
+
+<p>URL is used as data structure of protocol. The metadata are stored as key-value pairs in URL parameters.</p>
+
+<pre><code class="language-text">dubbo://192.168.43.137:20880/org.apache.dubbo.demo.DemoService? 
+anyhost=true&amp;application=demo-provider&amp;bind.ip=192.168.43.137&amp;bind.port=20880&amp;deprecated=false
+&amp;dubbo=2.0.2&amp;dynamic=true&amp;generic=false&amp;interface=org.apache.dubbo.demo.DemoService
+&amp;metadata-type=remote &amp;methods=sayHello,sayHelloAsync&amp;pid=88546&amp;qos.port=22222&amp;release=
+&amp;side=provider&amp;timestamp=1596270566561
+</code></pre>
+
+<h2 id="toc_10">6. Further questions that I don&#39;t have the answers yet</h2>
+
+<ol>
+<li>How does the client configure retry and timeout?</li>
+<li>Does the client use any connection pool? How to configure the pool size and idle connection timeout?</li>
+<li>How does the client authenticate itself when calling server? or How does the server protect itself being called by unauthorized clients?</li>
+<li>What is the minimal dependency for the client and server to use dubbo? Is it <code>&lt;artifactId&gt;dubbo-dependencies-bom&lt;/artifactId&gt;</code>)?</li>
+<li>What is the difference between <code>&lt;artifactId&gt;dubbo-dependencies-bom&lt;/artifactId&gt;</code> and <code>&lt;artifactId&gt;dubbo-bom&lt;/artifactId&gt;</code>?</li>
+</ol>
 
 ]]></content>
   </entry>

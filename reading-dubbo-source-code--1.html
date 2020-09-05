@@ -81,6 +81,8 @@
         
             <li><a href="Server%20and%20RPC.html">Server and RPC</a></li>
         
+            <li><a href="CommandsAndTools.html">Commands and Tools</a></li>
+        
             <li><a href="StorageSystem.html">Storage System</a></li>
         
             <li><a href="SystemDesign.html">System Design</a></li>
@@ -156,6 +158,12 @@
 </li>
 </ul>
 </li>
+<li>
+<a href="#toc_9">5. Dubbo URL</a>
+</li>
+<li>
+<a href="#toc_10">6. Further questions that I don&#39;t have the answers yet</a>
+</li>
 </ul>
 
 
@@ -202,7 +210,7 @@ The default path is <code>./conf</code>. As a local test environment, I will jus
 
 <h3 id="toc_6">4.2 Provider and Consumer</h3>
 
-<p><code>dubbo-demo</code> module provides three ways to use Dubbo. The essence is the same. The service provider is DemoService and the consumer is just a main method.</p>
+<p><code>dubbo-demo</code> module provides three flavors to use Dubbo. The service provider is DemoService and the consumer is just a main method. Let&#39;s take the XML configured Spring as example. </p>
 
 <p>Service provider creates the actual serviceImpl bean, and pass it to <code>interface</code> definition:</p>
 
@@ -235,8 +243,7 @@ CompletableFuture&lt;String&gt; hello = demoService.sayHelloAsync(&quot;world&qu
 <pre><code class="language-text">mvn clean install -Dmaven.test.skip=true 
 </code></pre>
 
-<p>Then we can start server and client just by running their main method. <br/>
-Yes, the server is not using any Servlet container. Dubbo uses Netty to serve dubbo protocol!</p>
+<p>Then we can start server and client just by running their main methods (Click the <code>run</code> on <code>main()</code> in IntelliJ, or use the CLI given in <code>dubbo-demo/README.md</code> which is the basic way to run a jar <code>java -jar jarName.jar</code>). Yes, the server is not using any Servlet container. Dubbo uses Netty to serve dubbo protocol!</p>
 
 <p>Logs from server shows it automatically register its current IP address (my laptop ip in LAN) and port (default 20880) to zookeeper (127.0.0.1:2181), with supported methods and interface name. </p>
 
@@ -301,7 +308,28 @@ dubbo version: , current host: 192.168.43.137
 
 <p>(I only list leaf nodes in above <code>ls -R /dubbo</code> results.)</p>
 
-<p>The last item is exactly the same as the one in service log &quot;Register dubbo service...&quot;. </p>
+<p>The last item is the Dubbo URL which also got logged when service starts - &quot;Register dubbo service...&quot;. </p>
+
+<h2 id="toc_9">5. Dubbo URL</h2>
+
+<p>URL is used as data structure of protocol. The metadata are stored as key-value pairs in URL parameters.</p>
+
+<pre><code class="language-text">dubbo://192.168.43.137:20880/org.apache.dubbo.demo.DemoService? 
+anyhost=true&amp;application=demo-provider&amp;bind.ip=192.168.43.137&amp;bind.port=20880&amp;deprecated=false
+&amp;dubbo=2.0.2&amp;dynamic=true&amp;generic=false&amp;interface=org.apache.dubbo.demo.DemoService
+&amp;metadata-type=remote &amp;methods=sayHello,sayHelloAsync&amp;pid=88546&amp;qos.port=22222&amp;release=
+&amp;side=provider&amp;timestamp=1596270566561
+</code></pre>
+
+<h2 id="toc_10">6. Further questions that I don&#39;t have the answers yet</h2>
+
+<ol>
+<li>How does the client configure retry and timeout?</li>
+<li>Does the client use any connection pool? How to configure the pool size and idle connection timeout?</li>
+<li>How does the client authenticate itself when calling server? or How does the server protect itself being called by unauthorized clients?</li>
+<li>What is the minimal dependency for the client and server to use dubbo? Is it <code>&lt;artifactId&gt;dubbo-dependencies-bom&lt;/artifactId&gt;</code>)?</li>
+<li>What is the difference between <code>&lt;artifactId&gt;dubbo-dependencies-bom&lt;/artifactId&gt;</code> and <code>&lt;artifactId&gt;dubbo-bom&lt;/artifactId&gt;</code>?</li>
+</ol>
 
 
     
@@ -311,6 +339,9 @@ dubbo version: , current host: 192.168.43.137
       <div class="row">
         <div class="large-6 columns">
         <p class="text-left" style="padding:15px 0px;">
+      
+          <a href="ssh-tunneling-example.html" 
+          title="Previous Post: SSH Tunneling Example">&laquo; SSH Tunneling Example</a>
       
         </p>
         </div>
@@ -376,6 +407,8 @@ dubbo version: , current host: 192.168.43.137
         
             <a href="Server%20and%20RPC.html"><strong>Server and RPC</strong></a>
         
+            <a href="CommandsAndTools.html"><strong>Commands and Tools</strong></a>
+        
             <a href="StorageSystem.html"><strong>Storage System</strong></a>
         
             <a href="SystemDesign.html"><strong>System Design</strong></a>
@@ -393,6 +426,12 @@ dubbo version: , current host: 192.168.43.137
                 <div class="side-content">
                 <ul class="posts-list">
 	      
+		      
+			      <li class="post">
+			        <a href="ssh-tunneling-example.html">SSH Tunneling Example</a>
+			      </li>
+		     
+		  
 		      
 			      <li class="post">
 			        <a href="reading-dubbo-source-code--1.html">Reading Dubbo Source Code - 1. Setup the Environment and Run Demo</a>
