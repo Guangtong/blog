@@ -115,38 +115,24 @@
                       
                       <div class="a-content-text">
                         
-                        	<h2 id="toc_0">Format</h2>
-
-<p><code>ssh -N -L &lt;local port&gt;:&lt;remote host&gt;:&lt;remote port&gt; &lt;SSH server&gt;<br/>
-</code></p>
-
+                        	<ul>
+<li>
+<a href="#toc_0">Format</a>
+</li>
+<li>
+<a href="#toc_1">Example</a>
 <ul>
-<li><code>-N</code>: Not to execute shell command, only listen and forward. </li>
-<li><code>-L</code>: Listen to <code>&lt;local port&gt;</code> on client machine.</li>
-<li>Any data send to this <code>&lt;local port&gt;</code> is forward to <code>&lt;remote host&gt;:&lt;remote port&gt;</code>. Therefore the application on <code>&lt;remote host&gt;</code> listening to <code>&lt;remote port&gt;</code> is used as if it was a local application. </li>
-<li><code>&lt;remote host&gt;</code> is usually the same as <code>&lt;SSH server&gt;</code>, i.e. <code>&lt;remote host&gt;</code> is localhost relative to <code>&lt;SSH server&gt;</code>.</li>
-<li><code>&lt;remote host&gt;</code> can be also be not on <code>&lt;SSH server&gt;</code>, i.e. <code>&lt;SSH server&gt;</code> is used as a bridge when data is forwarded from <code>&lt;SSH client&gt;:&lt;local port&gt;</code>and <code>&lt;remote host&gt;:&lt;remote port&gt;</code></li>
+<li>
+<a href="#toc_2">1. Remote Debug a service on a cloud server &lt;ssh_server&gt;</a>
+</li>
+<li>
+<a href="#toc_3">2. Remote Debug a service on a cloud server &lt;target_host&gt; through a bastion host &lt;ssh_server&gt;</a>
+</li>
+</ul>
+</li>
 </ul>
 
-<p><img src="media/15971864317792/15971864950747.jpg" alt=""/></p>
 
-<h2 id="toc_1">Example</h2>
-
-<h3 id="toc_2">1. Remote Debug a service on a cloud server <ssh_server></h3>
-
-<p>Forward client machines&#39;s <code>localhost:5050</code> to <ssh_server>&#39;s <code>localhost:5050</code></p>
-
-<p><code>ssh -N -L 5050:localhost:5050 &lt;username&gt;@&lt;ssh_server&gt;</code></p>
-
-<h3 id="toc_3">2. Remote Debug a service on a cloud server <target_host> through a bastion host <ssh_server></h3>
-
-<p>On client machine, forward client machine&#39;s <code>5022</code> to <code>&lt;target_host&gt;:22</code>. The goal is to use client machine&#39;s <code>5022</code> port as if it was <code>&lt;target_host&gt;:22</code>. After this setting, data to local <code>5022</code> is forwarded to <code>&lt;target_host&gt;:22</code> , therefore local becomes a local endpointwe make local <code>5022</code> to be the same you can even ssh to <code>&lt;target_host&gt;:22</code> by <code>ssh -p 5022 localhost</code>.</p>
-
-<p><code>ssh -A -N -L 5022:&lt;target_host&gt;:22 &lt;username&gt;@&lt;ssh_server&gt;</code></p>
-
-<p>On client machine, forward client machine&#39;s <code>5050</code> to <code>localhost:5050</code> through <code>localhost</code>.</p>
-
-<p><code>ssh -p 5022 -N -L 5050:localhost:5050 localhost</code></p>
 
                         
                       </div>
@@ -154,7 +140,7 @@
                 </a>
                 <div class="read-more clearfix">
                   <div class="more-left left">
-                  
+                   <a href="ssh-tunneling-example.html">Read more</a>&nbsp;&nbsp; 
                     <span class="date">08/11/2020</span>
                     <span>posted in&nbsp;</span> 
           				  
