@@ -4,7 +4,7 @@
   <title><![CDATA[swdev.online]]></title>
   <link href="https://swdev.online/atom.xml" rel="self"/>
   <link href="https://swdev.online/"/>
-  <updated>2020-09-04T23:05:51-07:00</updated>
+  <updated>2020-09-04T23:19:16-07:00</updated>
   <id>https://swdev.online/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -26,7 +26,7 @@
 <a href="#toc_1">Compare Java Way and Python Way of Dependency Management</a>
 </li>
 <li>
-<a href="#toc_2">venv</a>
+<a href="#toc_2">virtualenv</a>
 <ul>
 <li>
 <a href="#toc_3">Create <code>venv</code> folder with <code>virtualenv</code></a>
@@ -54,32 +54,34 @@
 
 <h2 id="toc_0">Why Dependency Management</h2>
 
-<p>You can install packages using <code>pip install</code> to your system&#39;s python environment and you can use your local python to develop your service. </p>
+<p>When I was beginner of python, I would install packages using <code>pip install</code> to my system&#39;s python environment and I can use this global python environment to develop my projects. </p>
 
-<p>But how do you publish your project? How do you deploy a python service to a cluster of hosts? </p>
+<p>But how can I publish a project? <br/>
+How can I deploy a python service to a cluster of hosts? <br/>
+It&#39;s wrong to login to each host to download / update dependencies.</p>
 
-<p>You need a way to manage dependencies:</p>
+<p>That&#39;s why we need a way to manage dependencies:</p>
 
 <ul>
 <li>When you deploy your service&#39;s source code to a new host, it can automatically download dependencies.</li>
-<li>The versions of the dependencies should be consistent with your development environment</li>
+<li>The versions of the dependencies should be consistent with your development environment.</li>
 <li>You can develop several projects in your local dev desktop and they can have different version sets.</li>
 </ul>
 
 <h2 id="toc_1">Compare Java Way and Python Way of Dependency Management</h2>
 
 <p>Based on my personal experience, there are two ways of dependency management - Classpath and Virtual Environment. <br/>
-In Java world, JDK doesn&#39;t management dependencies for you. You service uses Maven/Gradle/Ant to download <code>jars</code> in the building phase of deployment, and these <code>jars</code> are added to the classpath when JDK starts the service in command line. <br/>
-In Python world, pip downloads dependencies to a python&#39;s global library path by default (e.g. <code>/usr/local/lib/python3.7/site-packages</code>) and we can use virtual environment as a local library path (e.g. <code>./venv/lib/python3.7/site-packages</code>).</p>
+In Java world, JDK doesn&#39;t management dependencies for you. Your service uses <code>Maven/Gradle/Ant</code> to download <code>jars</code> in the building phase of deployment, and these <code>jars</code> are added to the classpath when JDK starts the service in command line. <br/>
+In Python world, <code>pip</code> downloads dependencies to a python&#39;s global library path by default (e.g. <code>/usr/local/lib/python3.7/site-packages</code>) and so we need to use a virtual environment as a local library path (e.g. <code>./venv/lib/python3.7/site-packages</code>).</p>
 
-<h2 id="toc_2">venv</h2>
+<h2 id="toc_2">virtualenv</h2>
 
 <h3 id="toc_3">Create <code>venv</code> folder with <code>virtualenv</code></h3>
 
 <p>Assuming python3.7 is already installed to dev or prod host. </p>
 
-<pre><code class="language-text"># virtualenv itself is a dependency package; install it to global environment
-pip3.7 install virtualenv           
+<pre><code class="language-text"># Install virtualenv to global environment
+pip3.7 install virtualenv
 
 # create a folder named venv as a local python environment
 virtualenv venv --python=python3.7
@@ -89,7 +91,7 @@ source ./venv/bin/activate
 
 </code></pre>
 
-<p>Now <code>./venv/bin/</code> is added to the front of PATH so the command <code>python</code> or <code>pip</code> is the ones under this path. When you use <code>pip</code> to install dependencies, they will go to <code>./venv/lib/python3.7/site-packages</code></p>
+<p>Now <code>./venv/bin/</code> is added to the front of <code>PATH</code> so the command <code>python</code> or <code>pip</code> is the ones under this path. When you use <code>pip</code> to install dependencies, they will go to <code>./venv/lib/python3.7/site-packages</code></p>
 
 <h3 id="toc_4">Deploy dependencies</h3>
 
@@ -106,7 +108,7 @@ beautifulsoup4==4.6.0
 urllib3==1.22
 </code></pre>
 
-<p>In the startup script<sup>[Assuming</sup> you are deployment your service to a cluster of hosts, you want to include all steps to run the service in a startup script] of your service, you use <code>pip install -r requirements.txt</code> to download all dependency libraries, before running the service code.</p>
+<p>In the startup script<sup>[Assuming</sup> you are deploying your service to a cluster of hosts, you want to include all steps to run the service in a startup script] of your service, you use <code>pip install -r requirements.txt</code> to download all dependency libraries, before running the service code.</p>
 
 <ul>
 <li>Question: can we define only major versions and let <code>pip</code> find the most recent minor version? </li>
@@ -125,13 +127,13 @@ pip3.7 install pipenv
 pipenv install
 </code></pre>
 
-<p>Note that there is no <code>venv</code> folder in your project path. Instead there will be folder with a random name under <code>~/.local/share/veritualenvs/</code>. In fact you never need to touch it or look at it. </p>
+<p>Note that there is no <code>venv</code> folder in your project path. Instead there will be a folder with a random name under <code>~/.local/share/viritualenvs/</code>. In fact you never need to touch it or look at it. </p>
 
 <h3 id="toc_7">Deploy dependencies</h3>
 
 <p>The actual dependency definition file is <code>Pipfile</code> with <code>Pipfile.lock</code>, automatically generated with <code>pipenv install</code>. We don&#39;t need <code>requirements.txt</code> anymore, Instead we include <code>Pipfile</code> and <code>Pipfile.lock</code> into our project source code.</p>
 
-<p>While <code>Pipfile.lock</code> works like a lock of minor versions using sha256, <code>Pipfile</code> can also specify a full version number. We want to modify <code>Pipfile</code> with only major versions so that we can always have recent minor version updates of dependencies in our local dev environment and lock them into <code>Pipfile.lock</code>.</p>
+<p>While <code>Pipfile.lock</code> works like a lock of minor versions using sha256, <code>Pipfile</code> also specifies a full version number when generated. We want to modify <code>Pipfile</code> with only major versions so that we can have recent minor version updates of dependencies in our local dev environment and lock them into <code>Pipfile.lock</code>.</p>
 
 <p>**[TODO] Add example of Pipfile and the steps to update Pipfile.lock ** </p>
 

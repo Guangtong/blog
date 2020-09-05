@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
   <loc>https://swdev.online/</loc>
-  <lastmod>2020-09-04T23:05:54-07:00</lastmod>
+  <lastmod>2020-09-04T23:19:18-07:00</lastmod>
 </url>
 
 <url>
@@ -53,6 +53,10 @@
 
 <url>
   <loc>https://swdev.online/CommandsAndTools.html</loc>
+</url>
+
+<url>
+  <loc>https://swdev.online/Languages.html</loc>
 </url>
 
 <url>
