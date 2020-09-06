@@ -170,7 +170,7 @@
 
 <p>But how can I publish a project? <br/>
 How can I deploy a python service to a cluster of hosts? <br/>
-It&#39;s wrong to login to each host to download / update dependencies.</p>
+It&#39;s not feasible to login to each host to download / update dependencies.</p>
 
 <p>That&#39;s why we need a way to manage dependencies:</p>
 
@@ -185,6 +185,8 @@ It&#39;s wrong to login to each host to download / update dependencies.</p>
 <p>Based on my personal experience, there are two ways of dependency management - Classpath and Virtual Environment. <br/>
 In Java world, JDK doesn&#39;t management dependencies for you. Your service uses <code>Maven/Gradle/Ant</code> to download <code>jars</code> in the building phase of deployment, and these <code>jars</code> are added to the classpath when JDK starts the service in command line. <br/>
 In Python world, <code>pip</code> downloads dependencies to a python&#39;s global library path by default (e.g. <code>/usr/local/lib/python3.7/site-packages</code>) and so we need to use a virtual environment as a local library path (e.g. <code>./venv/lib/python3.7/site-packages</code>).</p>
+
+<p>NodeJS is using the Virtual Environment way - Manage dependencies with a <code>package.json</code> file and install dependencies to a local <code>node_modules</code> instead of globally. </p>
 
 <h2 id="toc_2">virtualenv</h2>
 
