@@ -193,13 +193,13 @@ In Python world, <code>pip</code> downloads dependencies to a python&#39;s globa
 <p>Assuming python3.7 is already installed to dev or prod host. </p>
 
 <pre><code class="language-text"># Install virtualenv to global environment
-pip3.7 install virtualenv
+$ pip3 install virtualenv
 
 # create a folder named venv as a local python environment
-virtualenv venv --python=python3.7
+$ virtualenv venv --python=python3.7
 
 # activate the local environment
-source ./venv/bin/activate
+$ source ./venv/bin/activate
 
 </code></pre>
 
@@ -233,10 +233,10 @@ urllib3==1.22
 <h3 id="toc_6">Create virtual enviroment with <code>pipenv</code></h3>
 
 <pre><code class="language-text"># install `pipenv` to global environment
-pip3.7 install pipenv
+$ pip3 install pipenv
 
 # It can install dependencies in `requirements.txt` or `Pipfile` automatically if either one exists.
-pipenv install
+$ pipenv install
 </code></pre>
 
 <p>Note that there is no <code>venv</code> folder in your project path. Instead there will be a folder with a random name under <code>~/.local/share/viritualenvs/</code>. In fact you never need to touch it or look at it. </p>
@@ -245,14 +245,31 @@ pipenv install
 
 <p>The actual dependency definition file is <code>Pipfile</code> with <code>Pipfile.lock</code>, automatically generated with <code>pipenv install</code>. We don&#39;t need <code>requirements.txt</code> anymore, Instead we include <code>Pipfile</code> and <code>Pipfile.lock</code> into our project source code.</p>
 
-<p>While <code>Pipfile.lock</code> works like a lock of minor versions using sha256, <code>Pipfile</code> also specifies a full version number when generated. We want to modify <code>Pipfile</code> with only major versions so that we can have recent minor version updates of dependencies in our local dev environment and lock them into <code>Pipfile.lock</code>.</p>
+<p>While <code>Pipfile.lock</code> works like a lock of minor versions using sha256, <code>Pipfile</code> also specifies a full version number when generated. We want to modify <code>Pipfile</code> with major version ranges so that we can have recent minor version updates of dependencies in our local dev environment and lock them into <code>Pipfile.lock</code>.</p>
 
-<p>**[TODO] Add example of Pipfile and the steps to update Pipfile.lock ** </p>
+<p>An example of <code>Pipfile</code> snippet.</p>
+
+<pre><code class="language-text">[[source]]
+name = &quot;pypi&quot;
+url = &quot;https://pypi.org/simple&quot;
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = &quot;&gt;=1.1.0, &lt;1.2.0&quot;
+flask-sqlalchemy = &quot;&gt;=2.4.0, &lt;2.5.0&quot;
+flask-login = &quot;&gt;=0.5.0, &lt;0.6.0&quot;
+
+[requires]
+python_version = &quot;3.8&quot;
+
+</code></pre>
 
 <p>On prod host, your startup script will be like this:</p>
 
-<pre><code class="language-text">pipenv install
-pipenv run python service.py
+<pre><code class="language-text">$ pipenv install
+$ pipenv run python service.py
 </code></pre>
 
 
